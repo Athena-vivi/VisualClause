@@ -7,16 +7,46 @@
     @apply border-border;
   }
 
+  html,
   body {
     @apply text-text-primary font-sans antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
     min-height: 100vh;
   }
 
-  /* 深海星空背景 - 仰望星空，脚踏深海 */
+  main, h1, h2, h3, h4, h5, h6, div, span, p {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* 深海神庙背景 - 彻底删除栅格 */
   .starsea-bg {
-    background: radial-gradient(ellipse at top, #0f172a 0%, #020617 50%, #000000 100%);
+    background: radial-gradient(ellipse at center, #0a0f1a 0%, #020617 50%, #000000 100%);
     min-height: 100vh;
+    position: relative;
+  }
+
+  /* 噪声纹理层 - 物质感 - 加深 */
+  .starsea-bg::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 }
 
@@ -123,19 +153,13 @@
   }
 }
 
-/* 壬水流动效果 - 光晕海浪 */
+/* 深海蓝色光晕 - 缓慢飘动，深海俯瞰感 */
 @keyframes ocean-wave-1 {
   0%, 100% {
     transform: translate(0%, 0%) scale(1);
   }
-  25% {
-    transform: translate(20%, -15%) scale(1.1);
-  }
   50% {
-    transform: translate(-15%, 20%) scale(0.9);
-  }
-  75% {
-    transform: translate(25%, 10%) scale(1.05);
+    transform: translate(8%, -6%) scale(1.02);
   }
 }
 
@@ -143,14 +167,8 @@
   0%, 100% {
     transform: translate(0%, 0%) scale(1);
   }
-  25% {
-    transform: translate(-25%, 20%) scale(1.15);
-  }
   50% {
-    transform: translate(20%, -25%) scale(0.85);
-  }
-  75% {
-    transform: translate(-20%, -15%) scale(1.1);
+    transform: translate(-12%, 8%) scale(1.03);
   }
 }
 
@@ -158,11 +176,8 @@
   0%, 100% {
     transform: translate(0%, 0%) scale(1);
   }
-  33% {
-    transform: translate(15%, 25%) scale(1.08);
-  }
-  66% {
-    transform: translate(-25%, -20%) scale(0.92);
+  50% {
+    transform: translate(5%, 5%) scale(1.01);
   }
 }
 
@@ -175,48 +190,47 @@
   overflow: hidden;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.4;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.5;
 }
 
 .ocean-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
-  animation-duration: 50s;
+  filter: blur(150px);
+  animation-duration: 80s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
 }
 
-/* 深海蓝色光晕 - 海浪漂移 */
+/* 深海蓝色光晕 - 边缘融入琥珀金 */
 .ocean-blob-1 {
-  width: 900px;
-  height: 900px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(30, 58, 138, 0.1) 40%, transparent 70%);
-  top: -350px;
-  left: -250px;
+  width: 1200px;
+  height: 1200px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(29, 78, 216, 0.08) 40%, rgba(212, 175, 55, 0.03) 70%, transparent 100%);
+  top: -400px;
+  left: -300px;
   animation-name: ocean-wave-1;
 }
 
 .ocean-blob-2 {
-  width: 1000px;
-  height: 1000px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(29, 78, 216, 0.08) 50%, transparent 70%);
-  bottom: -400px;
-  right: -300px;
+  width: 1400px;
+  height: 1400px;
+  background: radial-gradient(circle, rgba(30, 58, 138, 0.12) 0%, rgba(37, 99, 235, 0.06) 50%, rgba(212, 175, 55, 0.02) 80%, transparent 100%);
+  bottom: -500px;
+  right: -400px;
   animation-name: ocean-wave-2;
-  animation-delay: -25s;
+  animation-delay: -40s;
 }
 
 .ocean-blob-3 {
-  width: 850px;
-  height: 850px;
-  background: radial-gradient(circle, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.07) 45%, transparent 70%);
-  top: 50%;
-  left: 50%;
+  width: 1000px;
+  height: 1000px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.05) 60%, transparent 100%);
+  top: 30%;
+  left: 30%;
   transform: translate(-50%, -50%);
   animation-name: ocean-wave-3;
-  animation-delay: -12s;
+  animation-delay: -20s;
 }
 
 /* 琥珀色光斑 - 阳光射入深海 */
@@ -281,6 +295,30 @@
   left: -100px;
   animation-name: amber-drift-2;
   animation-delay: -20s;
+}
+
+/* 中心琥珀光斑 - 神庙核心 */
+.amber-spot-3 {
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.06) 0%, rgba(244, 208, 63, 0.03) 50%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: amber-drift-1 60s ease-in-out infinite;
+  animation-delay: -30s;
+}
+
+/* 中心琥珀光斑 - 极微弱环境光 */
+.amber-spot-3 {
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.02) 0%, rgba(244, 208, 63, 0.01) 50%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: amber-drift-1 100s ease-in-out infinite;
+  animation-delay: -30s;
 }
 
 /* 动态星空 - Astra Twinkle */

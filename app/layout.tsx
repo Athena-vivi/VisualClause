@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
+import { Inter, Merriweather, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const playfair = Playfair_Display({
+const merriweather = Merriweather({
   subsets: ["latin"],
   variable: "--font-serif",
-  weight: ["400", "500", "600"]
+  weight: ["300", "400", "700", "900"],
+  style: ["normal", "italic"]
 });
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
@@ -33,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="dark">
-      <body className={`${inter.variable} ${playfair.variable} ${jetbrains.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${merriweather.variable} ${jetbrains.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

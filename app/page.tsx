@@ -1,36 +1,40 @@
 'use client';
 
-import LatticeGrid from '@/components/LatticeGrid';
-import AIChat from '@/components/AIChat';
-import SystemEquilibrium from '@/components/SystemEquilibrium';
+import { useEffect, useState, useRef } from 'react';
+import { motion } from 'framer-motion';
 import AstraLogo from '@/components/AstraLogo';
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+
+interface ShootingStar {
+  id: number;
+  startX: number;
+  startY: number;
+  angle: number;
+}
 
 export default function Home() {
-  const [activeSection, setActiveSection] = useState<'feed' | 'archive' | 'pulse' | 'resonance'>('feed');
+  const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [shootingStars, setShootingStars] = useState<ShootingStar[]>([]);
+  const [oceanPulse, setOceanPulse] = useState(false);
+  const rippleIdRef = useRef(0);
+  const shootingStarIdRef = useRef(0);
 
-  // 动态生成星空
+  // 动态生成星空 - 极致精致
   useEffect(() => {
     const starfield = document.createElement('div');
     starfield.className = 'starfield';
     document.body.appendChild(starfield);
 
-    // 生成 70 个星辰
-    for (let i = 0; i < 70; i++) {
+    // 生成 30 个极精致星辰
+    for (let i = 0; i < 30; i++) {
       const star = document.createElement('div');
       star.className = 'star';
 
-      // 随机位置
       const x = Math.random() * 100;
       const y = Math.random() * 100;
-
-      // 随机大小 (1px - 2px)
-      const size = Math.random() * 1 + 1;
-
-      // 随机动画延迟，使闪烁更自然
-      const delay = Math.random() * 3;
-      const duration = Math.random() * 2 + 2; // 2-4s
+      const size = Math.random() * 1 + 0.5; // 0.5-1.5px
+      const delay = Math.random() * 5;
+      const duration = Math.random() * 4 + 4; // 4-8s
 
       star.style.left = `${x}%`;
       star.style.top = `${y}%`;
@@ -42,184 +46,269 @@ export default function Home() {
       starfield.appendChild(star);
     }
 
-    // 视差滚动效果 - 鼠标移动产生深渊空间感
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2; // -1 to 1
-      const y = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
-
-      // 星空移动缓慢（深处）- 最大位移 20px
-      if (starfield) {
-        starfield.style.transform = `translate(${x * 10}px, ${y * 10}px)`;
-      }
-
-      // 壬水光晕移动较快（浅层）- 最大位移 40px
-      const oceanFlow = document.querySelector('.ocean-flow') as HTMLElement;
-      if (oceanFlow) {
-        oceanFlow.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
       document.body.removeChild(starfield);
     };
   }, []);
 
+  // 琥珀流影 - 鼠标移动涟漪（保留涟漪，移除视差）
+  useEffect(() => {
+    let lastRippleTime = 0;
+    const rippleDelay = 150;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const now = Date.now();
+      if (now - lastRippleTime > rippleDelay) {
+        lastRippleTime = now;
+        const id = rippleIdRef.current++;
+        setRipples(prev => [...prev, { id, x: e.clientX, y: e.clientY }]);
+
+        setTimeout(() => {
+          setRipples(prev => prev.filter(r => r.id !== id));
+        }, 2000);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Astra 流星动效 - 每 5-15 秒随机出现
+  useEffect(() => {
+    const spawnShootingStar = () => {
+      const id = shootingStarIdRef.current++;
+      const startX = Math.random() * window.innerWidth * 0.6;
+      const startY = Math.random() * window.innerHeight * 0.5;
+      const angle = 45;
+
+      setShootingStars(prev => [...prev, { id, startX, startY, angle }]);
+
+      setOceanPulse(true);
+      setTimeout(() => setOceanPulse(false), 200);
+
+      setTimeout(() => {
+        setShootingStars(prev => prev.filter(s => s.id !== id));
+      }, 1200);
+    };
+
+    const firstDelay = 2000;
+    const scheduleNext = () => {
+      const delay = 5000 + Math.random() * 10000;
+      setTimeout(() => {
+        spawnShootingStar();
+        scheduleNext();
+      }, delay);
+    };
+
+    const firstTimer = setTimeout(() => {
+      spawnShootingStar();
+      scheduleNext();
+    }, firstDelay);
+
+    return () => clearTimeout(firstTimer);
+  }, []);
+
   return (
-    <main className="min-h-screen starsea-bg relative">
-      {/* 壬水流动效果 - 光晕海浪 */}
-      <div className="ocean-flow">
+    <main className="h-screen w-full starsea-bg relative overflow-hidden" style={{ margin: 0, padding: 0 }}>
+      {/* 深海蓝色光晕 */}
+      <motion.div
+        className="ocean-flow"
+        animate={{
+          opacity: oceanPulse ? [0.5, 0.7, 0.5] : 0.5,
+        }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+      >
         <div className="ocean-blob ocean-blob-1"></div>
         <div className="ocean-blob ocean-blob-2"></div>
         <div className="ocean-blob ocean-blob-3"></div>
+      </motion.div>
+
+      {/* Astra 流星 */}
+      {shootingStars.map(star => (
+        <motion.div
+          key={star.id}
+          className="fixed pointer-events-none z-15"
+          style={{
+            left: star.startX,
+            top: star.startY,
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="relative"
+            initial={{ x: 0, y: 0, opacity: 1 }}
+            animate={{ x: 500, y: 500, opacity: 0 }}
+            transition={{ duration: 3, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {/* 流星尾迹 */}
+            <div
+              className="absolute origin-top-left"
+              style={{
+                width: '120px',
+                height: '1px',
+                background: 'linear-gradient(to right, rgba(212, 175, 55, 0.9) 0%, rgba(248, 250, 252, 0.6) 50%, transparent 100%)',
+                transform: 'rotate(45deg)',
+                transformOrigin: 'left center',
+              }}
+            />
+            {/* 流星头部 */}
+            <div
+              className="absolute left-0 top-0 w-4 h-4 rounded-full"
+              style={{
+                background: 'radial-gradient(circle, rgba(212, 175, 55, 0.8) 0%, transparent 70%)',
+                filter: 'blur(2px)',
+              }}
+            />
+          </motion.div>
+        </motion.div>
+      ))}
+
+      {/* 琥珀流影 - 鼠标涟漪 */}
+      {ripples.map(ripple => (
+        <motion.div
+          key={ripple.id}
+          className="fixed pointer-events-none z-20"
+          style={{
+            left: ripple.x,
+            top: ripple.y,
+          }}
+          initial={{ scale: 0, opacity: 0.15 }}
+          animate={{ scale: 3, opacity: 0 }}
+          transition={{ duration: 2, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <div
+            className="w-8 h-8 rounded-full"
+            style={{
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%)',
+              filter: 'blur(2px)',
+            }}
+          />
+        </motion.div>
+      ))}
+
+      {/* Logo - 能量核 */}
+      <div className="fixed top-1/2 right-1/4 -translate-y-1/2 z-50">
+        <motion.div
+          animate={{
+            rotate: [0, 2, -2, 0],
+            scale: [1, 1.02, 0.98, 1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+          style={{
+            filter: 'drop-shadow(0 0 60px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 120px rgba(37, 99, 235, 0.2))',
+          }}
+        >
+          <AstraLogo size={180} />
+        </motion.div>
+
+        {/* Logo 照亮背景水域 */}
+        <motion.div
+          className="absolute inset-0 -translate-y-1/2 pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle at center, rgba(212, 175, 55, 0.03) 0%, transparent 50%)',
+            filter: 'blur(40px)',
+          }}
+          animate={{
+            opacity: [0.3, 0.5, 0.3],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+        />
       </div>
 
-      {/* 琥珀色光斑 - 阳光射入深海 */}
-      <div className="amber-glow">
-        <div className="amber-spot amber-spot-1"></div>
-        <div className="amber-spot amber-spot-2"></div>
-      </div>
 
-      {/* 顶部导航 */}
-      <header className="border-b border-white/10 bg-white/5 backdrop-blur-md sticky top-0 z-30 relative">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <AstraLogo size={40} />
-            <div>
-              <h1 className="text-text-primary text-xl font-light tracking-[0.25em]">VisualClause</h1>
+      {/* 黄金分割布局容器 - 标题和入口链接 */}
+      <div
+        className="fixed z-10 flex flex-col"
+        style={{
+          top: '50%',
+          left: '38.2%',
+          transform: 'translate(-50%, -50%)',
+          margin: 0,
+          padding: 0
+        }}
+      >
+        {/* 碑文式标题 */}
+        <motion.div
+          initial={{ opacity: 0, filter: 'blur(20px)' }}
+          animate={{ opacity: 1, filter: 'blur(0px)' }}
+          transition={{ duration: 2.5, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <h1 style={{ letterSpacing: '0.6em', margin: 0, padding: 0 }}>
+            <div style={{ margin: 0, padding: 0 }} className="text-tertiary text-2xl md:text-4xl lg:text-5xl font-serif font-light leading-[2.5]">
+              <span className="inline-block opacity-100">This is a</span>
             </div>
-          </div>
+            <div style={{ margin: 0, padding: 0 }} className="text-tertiary text-2xl md:text-4xl lg:text-5xl font-serif font-light leading-[2.5]">
+              <span className="inline-block opacity-90">generating</span>
+            </div>
+            <div style={{ margin: 0, padding: 0 }} className="text-tertiary text-2xl md:text-4xl lg:text-5xl font-serif font-light leading-[2.5]">
+              <span className="inline-block opacity-80">mechanism.</span>
+            </div>
+          </h1>
+        </motion.div>
 
-          {/* 导航入口 */}
-          <nav className="flex items-center gap-8">
-            {[
-              { id: 'archive', label: 'Archive' },
-              { id: 'pulse', label: 'Pulse' },
-              { id: 'resonance', label: 'Resonance' }
-            ].map((item) => (
-              <motion.button
-                key={item.id}
-                onClick={() => setActiveSection(item.id as any)}
-                className={`text-sm tracking-wider font-serif transition-colors relative ${
-                  activeSection === item.id
-                    ? 'text-accent-gold'
-                    : 'text-text-tertiary hover:text-text-secondary'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {item.label}
-                {activeSection === item.id && (
-                  <motion.div
-                    className="absolute -bottom-2 left-0 right-0 h-px bg-accent-gold"
-                    layoutId="activeNav"
-                    style={{
-                      boxShadow: '0 0 8px rgba(212, 175, 55, 0.6)'
-                    }}
-                  />
-                )}
-              </motion.button>
-            ))}
-          </nav>
+        {/* 极简入口 - 竖线 + 文字（天然与标题左对齐） */}
+        <div className="flex flex-col gap-8 mt-24">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5, delay: 1.5, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <Link href="/archive" className="group flex items-center gap-6">
+              <div className="relative w-px h-12 bg-gradient-to-b from-transparent via-white/20 to-transparent overflow-hidden">
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-b from-accent-gold/60 via-accent-gold to-accent-gold/60"
+                  initial={{ scaleY: 0 }}
+                  whileHover={{ scaleY: 1 }}
+                  transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                  style={{ transformOrigin: 'center' }}
+                />
+              </div>
+              <span className="text-secondary text-xs tracking-[0.3em] opacity-70 group-hover:opacity-100 transition-opacity duration-700">
+                ARCHIVE
+              </span>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5, delay: 1.8, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <Link href="/protocols" className="group flex items-center gap-6">
+              <div className="relative w-px h-12 bg-gradient-to-b from-transparent via-white/20 to-transparent overflow-hidden">
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-b from-accent-gold/60 via-accent-gold to-accent-gold/60"
+                  initial={{ scaleY: 0 }}
+                  whileHover={{ scaleY: 1 }}
+                  transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                  style={{ transformOrigin: 'center' }}
+                />
+              </div>
+              <span className="text-secondary text-xs tracking-[0.3em] opacity-70 group-hover:opacity-100 transition-opacity duration-700">
+                PROTOCOLS
+              </span>
+            </Link>
+          </motion.div>
         </div>
-      </header>
-
-      {/* 主内容区 */}
-      <div className="max-w-7xl mx-auto px-8 py-16 relative z-10">
-        {/* 系统状态面板 */}
-        <div className="mb-16">
-          <SystemEquilibrium />
-        </div>
-
-        {/* 内容区域切换 */}
-        <AnimatePresence mode="wait">
-          {activeSection === 'feed' && (
-            <motion.div
-              key="feed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-            >
-              <section className="mb-12">
-                <h2 className="text-text-primary text-2xl tracking-[0.2em] font-serif text-center">The Lattice Feed</h2>
-              </section>
-              <LatticeGrid />
-            </motion.div>
-          )}
-
-          {activeSection === 'archive' && (
-            <motion.div
-              key="archive"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-            >
-              <section className="mb-12">
-                <h2 className="text-text-primary text-2xl tracking-[0.2em] font-serif text-center">Archive</h2>
-                <p className="text-text-tertiary text-sm text-center mt-4 font-mono">历史记忆的存储库</p>
-              </section>
-              <div className="metal-card p-12 text-center">
-                <p className="text-text-tertiary font-serif">档案内容正在整理中...</p>
-              </div>
-            </motion.div>
-          )}
-
-          {activeSection === 'pulse' && (
-            <motion.div
-              key="pulse"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-            >
-              <section className="mb-12">
-                <h2 className="text-text-primary text-2xl tracking-[0.2em] font-serif text-center">Pulse</h2>
-                <p className="text-text-tertiary text-sm text-center mt-4 font-mono">思维的脉搏跳动</p>
-              </section>
-              <div className="metal-card p-12 text-center">
-                <p className="text-text-tertiary font-serif">脉搏数据收集中...</p>
-              </div>
-            </motion.div>
-          )}
-
-          {activeSection === 'resonance' && (
-            <motion.div
-              key="resonance"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-            >
-              <section className="mb-12">
-                <h2 className="text-text-primary text-2xl tracking-[0.2em] font-serif text-center">Resonance</h2>
-                <p className="text-text-tertiary text-sm text-center mt-4 font-mono">与世界的共鸣频率</p>
-              </section>
-              <div className="metal-card p-12 text-center">
-                <p className="text-text-tertiary font-serif">共鸣记录正在建立...</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
-      {/* 底部信息 */}
-      <footer className="border-t border-white/10 mt-32 py-12 relative z-10">
-        <div className="max-w-7xl mx-auto px-8 text-center">
-          <p className="text-text-tertiary text-sm tracking-wide font-serif">
-            Visual & Clause
-          </p>
-          <p className="text-text-tertiary text-xs mt-6 tracking-wider">
-            © 2025 Zhang YuLing
-          </p>
-        </div>
+      {/* 底部版权 */}
+      <footer className="fixed bottom-6 right-12 z-20">
+        <p className="text-secondary text-[10px] tracking-[0.2em] opacity-30">
+          © 2025 Zhang YuLing
+        </p>
       </footer>
-
-      {/* AI 聊天悬浮窗 */}
-      <AIChat />
     </main>
   );
 }
