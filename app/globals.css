@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-text-primary font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* 晶格背景纹理 */
+  .lattice-bg {
+    background-image:
+      linear-gradient(rgba(237, 237, 237, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(237, 237, 237, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+}
+
+@layer components {
+  /* 金属卡片 */
+  .metal-card {
+    @apply bg-surface border border-border rounded-sm;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .metal-card:hover {
+    @apply bg-surfaceHover border-accent-blue/30 shadow-metal;
+    transform: translateY(-2px);
+  }
+
+  /* 极简按钮 */
+  .metal-button {
+    @apply px-4 py-2 bg-surface border border-border text-text-primary text-sm;
+    transition: all 0.2s ease;
+  }
+
+  .metal-button:hover {
+    @apply border-accent-blue/50 shadow-metal;
+  }
+
+  /* 晶格输入框 */
+  .metal-input {
+    @apply bg-background border border-border text-text-primary px-4 py-2;
+    transition: all 0.2s ease;
+  }
+
+  .metal-input:focus {
+    @apply border-accent-blue/50 outline-none shadow-metal;
+  }
+
+  /* 金属光泽扫描线动画 */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .shimmer-effect {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(74, 144, 226, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A2A2D;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A3A3D;
+}
