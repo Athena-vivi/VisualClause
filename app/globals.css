@@ -8,71 +8,206 @@
   }
 
   body {
-    @apply bg-background text-text-primary font-sans antialiased;
+    @apply text-text-primary font-sans antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    min-height: 100vh;
   }
 
-  /* 晶格背景纹理 */
-  .lattice-bg {
-    background-image:
-      linear-gradient(rgba(237, 237, 237, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(237, 237, 237, 0.02) 1px, transparent 1px);
-    background-size: 50px 50px;
+  /* 深海星空背景 - 仰望星空，脚踏深海 */
+  .starsea-bg {
+    background: radial-gradient(ellipse at top, #0f172a 0%, #020617 50%, #000000 100%);
+    min-height: 100vh;
   }
 }
 
 @layer components {
-  /* 金属卡片 */
+  /* 深海玻璃卡片 - 辛金硬度 + 壬水流动 */
   .metal-card {
-    @apply bg-surface border border-border rounded-sm;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-sm;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
   }
 
   .metal-card:hover {
-    @apply bg-surfaceHover border-accent-blue/30 shadow-metal;
-    transform: translateY(-2px);
+    @apply bg-white/10 border-accent-blue/20;
+    box-shadow: 0 8px 32px -2px rgba(74, 144, 226, 0.15),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+                0 0 60px -15px rgba(74, 144, 226, 0.3);
+    transform: translateY(-4px);
   }
 
-  /* 极简按钮 */
+  /* 极简按钮 - 玻璃质感 */
   .metal-button {
-    @apply px-4 py-2 bg-surface border border-border text-text-primary text-sm;
-    transition: all 0.2s ease;
+    @apply px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 text-text-primary text-sm rounded-sm;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 12px -1px rgba(0, 0, 0, 0.15);
   }
 
   .metal-button:hover {
-    @apply border-accent-blue/50 shadow-metal;
+    @apply bg-white/10 border-accent-blue/30;
+    box-shadow: 0 4px 20px -2px rgba(74, 144, 226, 0.2);
+    transform: translateY(-1px);
   }
 
-  /* 晶格输入框 */
+  /* 晶格输入框 - 玻璃质感 */
   .metal-input {
-    @apply bg-background border border-border text-text-primary px-4 py-2;
-    transition: all 0.2s ease;
+    @apply bg-white/5 backdrop-blur-md border border-white/10 text-text-primary px-4 py-2 rounded-sm;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 8px -2px rgba(0, 0, 0, 0.2);
   }
 
   .metal-input:focus {
-    @apply border-accent-blue/50 outline-none shadow-metal;
+    @apply bg-white/10 border-accent-blue/30 outline-none;
+    box-shadow: inset 0 2px 8px -2px rgba(0, 0, 0, 0.2),
+                0 0 0 3px rgba(74, 144, 226, 0.1);
   }
+}
 
-  /* 金属光泽扫描线动画 */
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
+/* 壬水流动效果 - 光晕海浪 */
+@keyframes ocean-wave-1 {
+  0%, 100% {
+    transform: translate(0%, 0%) scale(1);
   }
+  25% {
+    transform: translate(20%, -15%) scale(1.1);
+  }
+  50% {
+    transform: translate(-15%, 20%) scale(0.9);
+  }
+  75% {
+    transform: translate(25%, 10%) scale(1.05);
+  }
+}
 
-  .shimmer-effect {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(74, 144, 226, 0.1) 50%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+@keyframes ocean-wave-2 {
+  0%, 100% {
+    transform: translate(0%, 0%) scale(1);
   }
+  25% {
+    transform: translate(-25%, 20%) scale(1.15);
+  }
+  50% {
+    transform: translate(20%, -25%) scale(0.85);
+  }
+  75% {
+    transform: translate(-20%, -15%) scale(1.1);
+  }
+}
+
+@keyframes ocean-wave-3 {
+  0%, 100% {
+    transform: translate(0%, 0%) scale(1);
+  }
+  33% {
+    transform: translate(15%, 25%) scale(1.08);
+  }
+  66% {
+    transform: translate(-25%, -20%) scale(0.92);
+  }
+}
+
+.ocean-flow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.4;
+}
+
+.ocean-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  animation-duration: 50s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* 深海蓝色光晕 - 海浪漂移 */
+.ocean-blob-1 {
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(30, 58, 138, 0.1) 40%, transparent 70%);
+  top: -350px;
+  left: -250px;
+  animation-name: ocean-wave-1;
+}
+
+.ocean-blob-2 {
+  width: 1000px;
+  height: 1000px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(29, 78, 216, 0.08) 50%, transparent 70%);
+  bottom: -400px;
+  right: -300px;
+  animation-name: ocean-wave-2;
+  animation-delay: -25s;
+}
+
+.ocean-blob-3 {
+  width: 850px;
+  height: 850px;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.07) 45%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-name: ocean-wave-3;
+  animation-delay: -12s;
+}
+
+/* 动态星空 - Astra Twinkle */
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+.starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+
+/* 金属光泽扫描线动画 */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-effect {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(74, 144, 226, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
 
 /* 滚动条美化 */

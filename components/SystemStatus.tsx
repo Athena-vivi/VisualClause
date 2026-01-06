@@ -17,7 +17,7 @@ export default function SystemStatus() {
 
   return (
     <div className="metal-card p-6 mb-8">
-      <h3 className="text-text-primary text-sm font-medium mb-4 flex items-center gap-2">
+      <h3 className="text-text-primary text-sm font-medium mb-4 flex items-center gap-2 tracking-wide">
         <Activity className="w-4 h-4 text-accent-blue" />
         系统状态 // {new Date().toLocaleDateString('zh-CN')}
       </h3>
@@ -26,15 +26,15 @@ export default function SystemStatus() {
         {/* 物理功耗 */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-text-secondary text-xs flex items-center gap-2">
+            <span className="text-text-secondary text-xs flex items-center gap-2 tracking-wide">
               <Zap className="w-3 h-3" />
               物理功耗
             </span>
-            <span className="text-text-primary text-sm font-mono">
-              {metrics?.steps || 0} / 10,000
+            <span className="text-text-primary text-sm font-mono tracking-wider">
+              {String(metrics?.steps || 0).padStart(5, '0')} / 10,000
             </span>
           </div>
-          <div className="h-1.5 bg-background border border-border rounded-sm overflow-hidden">
+          <div className="h-1.5 bg-white/5 border border-white/10 rounded-sm overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-accent-blue/50 to-accent-blue transition-all duration-500"
               style={{ width: `${Math.min(((metrics?.steps || 0) / 10000) * 100, 100)}%` }}
@@ -45,15 +45,15 @@ export default function SystemStatus() {
         {/* 脑力熵减 */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-text-secondary text-xs flex items-center gap-2">
+            <span className="text-text-secondary text-xs flex items-center gap-2 tracking-wide">
               <Activity className="w-3 h-3" />
               脑力熵减
             </span>
-            <span className="text-text-primary text-sm font-mono">
-              {metrics?.entry_count || 0} 条 Entry
+            <span className="text-text-primary text-sm font-mono tracking-wider">
+              {String(metrics?.entry_count || 0).padStart(2, '0')} 条 Entry
             </span>
           </div>
-          <div className="h-1.5 bg-background border border-border rounded-sm overflow-hidden">
+          <div className="h-1.5 bg-white/5 border border-white/10 rounded-sm overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-accent-gold/50 to-accent-gold transition-all duration-500"
               style={{ width: `${Math.min(((metrics?.entry_count || 0) / 10) * 100, 100)}%` }}
@@ -64,11 +64,11 @@ export default function SystemStatus() {
 
       {/* 审美共振 */}
       {metrics?.current_music && (
-        <div className="mt-6 pt-4 border-t border-border">
-          <div className="flex items-center gap-2 text-text-secondary text-xs">
+        <div className="mt-6 pt-4 border-t border-white/10">
+          <div className="flex items-center gap-2 text-text-secondary text-xs tracking-wide">
             <Music className="w-3 h-3 text-accent-blue" />
             <span>当前频率:</span>
-            <span className="text-accent-blue">{metrics.current_music}</span>
+            <span className="text-accent-blue tracking-wide">{metrics.current_music}</span>
           </div>
         </div>
       )}
