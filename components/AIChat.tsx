@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import AstraLogo from './AstraLogo';
 
 export interface ChatMessage {
@@ -75,25 +75,49 @@ export default function AIChat() {
 
   return (
     <>
-      {/* 悬浮按钮 */}
+      {/* 左边中间 - 固定入口按钮 */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-8 right-8 z-40 w-14 h-14 bg-white/5 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group"
+        className="relative group"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        {isOpen ? (
-          <X className="w-6 h-6 text-accent-blue" />
-        ) : (
-          <MessageCircle className="w-6 h-6 text-accent-blue group-hover:scale-110 transition-transform" />
-        )}
+        {/* Astra Logo */}
+        <div className="relative">
+          <motion.div
+            animate={{
+              rotate: [0, 2, -2, 0],
+              scale: [1, 1.02, 0.98, 1],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: [0.4, 0, 0.2, 1],
+            }}
+            style={{
+              filter: 'drop-shadow(0 0 40px rgba(212, 175, 55, 0.2)) drop-shadow(0 0 80px rgba(74, 144, 226, 0.15))',
+            }}
+          >
+            <AstraLogo size={64} />
+          </motion.div>
+
+          {/* 悬停时的琥珀金光圈 */}
+          <div className="absolute inset-0 -m-2 rounded-full bg-accent-gold/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+        </div>
+
+        {/* 提示文字 */}
+        <div className="absolute left-full ml-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 whitespace-nowrap">
+          <span className="text-secondary text-xs tracking-[0.3em]">
+            ASTRA
+          </span>
+        </div>
       </motion.button>
 
       {/* 聊天窗口 */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed bottom-28 right-8 z-40 w-96 max-h-[600px] bg-white/5 backdrop-blur-md border border-white/10 rounded-sm flex flex-col"
+            className="fixed left-24 top-1/2 -translate-y-1/2 z-50 w-96 max-h-[600px] bg-white/5 backdrop-blur-md border border-white/10 rounded-sm flex flex-col"
             style={{
               /* 深空黑洞阴影 */
               boxShadow: `
@@ -125,8 +149,7 @@ export default function AIChat() {
                   <div className="inline-block mb-4 opacity-60">
                     <AstraLogo size={40} />
                   </div>
-                  <p className="text-text-secondary text-sm tracking-wide font-serif mt-4">这里是 Astra 的逻辑余温。</p>
-                  <p className="text-text-tertiary text-xs mt-3 tracking-wider">告诉我，你在思考什么？</p>
+                  <p className="text-text-secondary text-sm tracking-wide font-serif mt-4">这里是 Astra 的宇宙。</p>
                 </div>
               )}
 

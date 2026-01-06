@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import AstraLogo from '@/components/AstraLogo';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import AIChat from '@/components/AIChat';
 import Link from 'next/link';
 
 interface ShootingStar {
@@ -113,6 +114,11 @@ export default function Home() {
     <main className="h-screen w-full bookish-bg relative overflow-hidden" style={{ margin: 0, padding: 0 }}>
       {/* 右上角语言切换按钮 */}
       <LanguageSwitcher />
+
+      {/* 左边中间 - AIChat 入口 */}
+      <div className="fixed left-8 top-1/2 -translate-y-1/2 z-20">
+        <AIChat />
+      </div>
 
       {/* 深海蓝色光晕 */}
       <motion.div
