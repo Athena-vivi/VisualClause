@@ -50,13 +50,13 @@ export default function SystemStatus() {
               脑力熵减
             </span>
             <span className="text-text-primary text-sm font-mono">
-              {metrics?.clause_count || 0} 条 Clause
+              {metrics?.entry_count || 0} 条 Entry
             </span>
           </div>
           <div className="h-1.5 bg-background border border-border rounded-sm overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-accent-gold/50 to-accent-gold transition-all duration-500"
-              style={{ width: `${Math.min(((metrics?.clause_count || 0) / 10) * 100, 100)}%` }}
+              style={{ width: `${Math.min(((metrics?.entry_count || 0) / 10) * 100, 100)}%` }}
             />
           </div>
         </div>
