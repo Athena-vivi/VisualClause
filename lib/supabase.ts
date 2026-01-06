@@ -197,6 +197,95 @@ export async function deleteEntry(entryId: string): Promise<boolean> {
 }
 
 // ----------------------------------------------------------------------------
+// Archive & Protocols 页面专用查询函数
+// ----------------------------------------------------------------------------
+
+/**
+ * 查询所有书籍 (source='book')
+ */
+export async function getBooks(): Promise<Entry[]> {
+  const siteKey = validateSiteKey();
+
+  const { data, error } = await supabase
+    .from('entries')
+    .select('*')
+    .eq('site_key', siteKey)
+    .eq('source', 'book')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(`[Supabase] Failed to fetch books for site "${siteKey}":`, error);
+    return [];
+  }
+
+  return data || [];
+}
+
+/**
+ * 查询所有协议 (source='protocol')
+ */
+export async function getProtocols(): Promise<Entry[]> {
+  const siteKey = validateSiteKey();
+
+  const { data, error } = await supabase
+    .from('entries')
+    .select('*')
+    .eq('site_key', siteKey)
+    .eq('source', 'protocol')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(`[Supabase] Failed to fetch protocols for site "${siteKey}":`, error);
+    return [];
+  }
+
+  return data || [];
+}
+
+/**
+ * 根据 ID 获取单个条目
+ */
+export async function getEntryById(id: string): Promise<Entry | null> {
+  const siteKey = validateSiteKey();
+
+  const { data, error } = await supabase
+    .from('entries')
+    .select('*')
+    .eq('id', id)
+    .eq('site_key', siteKey)
+    .single();
+
+  if (error) {
+    console.error(`[Supabase] Failed to fetch entry "${id}" for site "${siteKey}":`, error);
+    return null;
+  }
+
+  return data;
+}
+
+/**
+ * 获取指定书籍的所有 Clauses
+ * 通过 metadata.book_id 或 tags 关联
+ */
+export async function getClausesByBookId(bookId: string): Promise<Entry[]> {
+  const siteKey = validateSiteKey();
+
+  const { data, error } = await supabase
+    .from('entries')
+    .select('*')
+    .eq('site_key', siteKey)
+    .or(`metadata->>book_id->>${bookId},tags->cs.{${bookId}}`)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error(`[Supabase] Failed to fetch clauses for book "${bookId}":`, error);
+    return [];
+  }
+
+  return data || [];
+}
+
+// ----------------------------------------------------------------------------
 // 向后兼容的类型别名与函数（保持现有组件兼容性）
 // ----------------------------------------------------------------------------
 

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import AstraLogo from '@/components/AstraLogo';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 
 interface ShootingStar {
@@ -109,7 +110,10 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="h-screen w-full starsea-bg relative overflow-hidden" style={{ margin: 0, padding: 0 }}>
+    <main className="h-screen w-full bookish-bg relative overflow-hidden" style={{ margin: 0, padding: 0 }}>
+      {/* 右上角语言切换按钮 */}
+      <LanguageSwitcher />
+
       {/* 深海蓝色光晕 */}
       <motion.div
         className="ocean-flow"
@@ -229,7 +233,7 @@ export default function Home() {
 
       {/* 黄金分割布局容器 - 标题和入口链接 */}
       <div
-        className="fixed z-10 flex flex-col"
+        className="fixed z-50 flex flex-col"
         style={{
           top: '50%',
           left: '38.2%',
@@ -274,8 +278,10 @@ export default function Home() {
                   style={{ transformOrigin: 'center' }}
                 />
               </div>
-              <span className="text-secondary text-xs tracking-[0.3em] opacity-70 group-hover:opacity-100 transition-opacity duration-700">
+              <span className="relative text-secondary text-xs tracking-[0.3em] opacity-70 group-hover:opacity-100 group-hover:text-accent-gold/90 transition-all duration-500">
                 ARCHIVE
+                {/* 悬停时的微光效果 - 仅在文字上 */}
+                <span className="absolute inset-0 bg-accent-gold/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-sm pointer-events-none -mx-1 -my-0.5 px-1 py-0.5" />
               </span>
             </Link>
           </motion.div>
@@ -295,8 +301,10 @@ export default function Home() {
                   style={{ transformOrigin: 'center' }}
                 />
               </div>
-              <span className="text-secondary text-xs tracking-[0.3em] opacity-70 group-hover:opacity-100 transition-opacity duration-700">
+              <span className="relative text-secondary text-xs tracking-[0.3em] opacity-70 group-hover:opacity-100 group-hover:text-accent-gold/90 transition-all duration-500">
                 PROTOCOLS
+                {/* 悬停时的微光效果 - 仅在文字上 */}
+                <span className="absolute inset-0 bg-accent-gold/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-sm pointer-events-none -mx-1 -my-0.5 px-1 py-0.5" />
               </span>
             </Link>
           </motion.div>
