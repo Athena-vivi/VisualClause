@@ -25,16 +25,75 @@
   .metal-card {
     @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-sm;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    /* 深空黑洞阴影 - 极深、大面积扩散 */
+    box-shadow:
+      /* 内部高光 - 玻璃顶部反射 */
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+      /* 主阴影 - 深渊扩散 */
+      0 4px 36px -3px rgba(0, 0, 0, 0.6),
+      /* 外层光晕 - 空间深度 */
+      0 12px 80px -8px rgba(0, 0, 0, 0.4),
+      /* 环境光折射 - 蓝色微光 */
+      0 0 40px -10px rgba(74, 144, 226, 0.15);
+    transform-style: preserve-3d;
   }
 
   .metal-card:hover {
-    @apply bg-white/10 border-accent-blue/20;
-    box-shadow: 0 8px 32px -2px rgba(74, 144, 226, 0.15),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-                0 0 60px -15px rgba(74, 144, 226, 0.3);
+    @apply bg-white/10;
+    /* 悬停时阴影增强 - 琥珀金温度 */
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+      0 8px 48px -6px rgba(0, 0, 0, 0.75),
+      0 20px 100px -12px rgba(0, 0, 0, 0.5),
+      0 0 60px -15px rgba(212, 175, 55, 0.25),
+      /* 琥珀金环境光 */
+      0 0 80px -20px rgba(212, 175, 55, 0.15);
+    border-color: rgba(212, 175, 55, 0.4);
     transform: translateY(-4px);
+  }
+
+  /* 3D 玻璃卡片 - 空间层级 + 环境光折射 */
+  .glass-3d {
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* 左上玻璃厚度边框 - 银色到金色渐变 */
+  .glass-edge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(248, 250, 252, 0.3) 15%,
+      rgba(248, 250, 252, 0.5) 50%,
+      rgba(248, 250, 252, 0.3) 85%,
+      transparent 100%
+    );
+    border-radius: 2px 2px 0 0;
+    pointer-events: none;
+    opacity: 0.7;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-3d:hover .glass-edge {
+    opacity: 1;
+    height: 2px;
+    /* 银色到金黄色的渐变 */
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(248, 250, 252, 0.5) 10%,
+      rgba(212, 175, 55, 0.6) 30%,
+      rgba(212, 175, 55, 0.9) 50%,
+      rgba(212, 175, 55, 0.6) 70%,
+      rgba(248, 250, 252, 0.5) 90%,
+      transparent 100%
+    );
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
   }
 
   /* 极简按钮 - 玻璃质感 */
@@ -117,6 +176,7 @@
   pointer-events: none;
   z-index: -1;
   opacity: 0.4;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ocean-blob {
@@ -159,6 +219,70 @@
   animation-delay: -12s;
 }
 
+/* 琥珀色光斑 - 阳光射入深海 */
+@keyframes amber-drift-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.08;
+  }
+  50% {
+    transform: translate(30px, -20px) scale(1.2);
+    opacity: 0.12;
+  }
+}
+
+@keyframes amber-drift-2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.06;
+  }
+  50% {
+    transform: translate(-25px, 15px) scale(1.15);
+    opacity: 0.1;
+  }
+}
+
+.amber-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.amber-spot {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation-duration: 40s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* 右上角琥珀光斑 - 阳光 */
+.amber-spot-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(244, 208, 63, 0.06) 40%, transparent 70%);
+  top: -200px;
+  right: -150px;
+  animation-name: amber-drift-1;
+}
+
+/* 左下角琥珀光斑 - 温度 */
+.amber-spot-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(184, 150, 14, 0.04) 50%, transparent 70%);
+  bottom: -150px;
+  left: -100px;
+  animation-name: amber-drift-2;
+  animation-delay: -20s;
+}
+
 /* 动态星空 - Astra Twinkle */
 @keyframes star-twinkle {
   0%, 100% {
@@ -180,6 +304,7 @@
   pointer-events: none;
   z-index: -1;
   overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .star {

@@ -16,10 +16,10 @@ export default function SystemStatus() {
   }, []);
 
   return (
-    <div className="metal-card p-6 mb-8">
-      <h3 className="text-text-primary text-sm font-medium mb-4 flex items-center gap-2 tracking-wide">
+    <div className="metal-card p-6">
+      <h3 className="text-text-primary text-sm font-medium mb-5 flex items-center gap-2 tracking-wide font-serif">
         <Activity className="w-4 h-4 text-accent-blue" />
-        系统状态 // {new Date().toLocaleDateString('zh-CN')}
+        系统状态 · {new Date().toLocaleDateString('zh-CN')}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -36,7 +36,7 @@ export default function SystemStatus() {
           </div>
           <div className="h-1.5 bg-white/5 border border-white/10 rounded-sm overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-accent-blue/50 to-accent-blue transition-all duration-500"
+              className="h-full bg-gradient-to-r from-accent-blue to-accent-gold transition-all duration-700 ease-out"
               style={{ width: `${Math.min(((metrics?.steps || 0) / 10000) * 100, 100)}%` }}
             />
           </div>
@@ -55,7 +55,7 @@ export default function SystemStatus() {
           </div>
           <div className="h-1.5 bg-white/5 border border-white/10 rounded-sm overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-accent-gold/50 to-accent-gold transition-all duration-500"
+              className="h-full bg-gradient-to-r from-accent-blue to-accent-gold transition-all duration-700 ease-out"
               style={{ width: `${Math.min(((metrics?.entry_count || 0) / 10) * 100, 100)}%` }}
             />
           </div>

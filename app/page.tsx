@@ -2,11 +2,14 @@
 
 import LatticeGrid from '@/components/LatticeGrid';
 import AIChat from '@/components/AIChat';
-import SystemStatus from '@/components/SystemStatus';
-import { Sparkles } from 'lucide-react';
-import { useEffect } from 'react';
+import SystemEquilibrium from '@/components/SystemEquilibrium';
+import AstraLogo from '@/components/AstraLogo';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
+  const [activeSection, setActiveSection] = useState<'feed' | 'archive' | 'pulse' | 'resonance'>('feed');
+
   // 动态生成星空
   useEffect(() => {
     const starfield = document.createElement('div');
@@ -39,7 +42,27 @@ export default function Home() {
       starfield.appendChild(star);
     }
 
+    // 视差滚动效果 - 鼠标移动产生深渊空间感
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2; // -1 to 1
+      const y = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
+
+      // 星空移动缓慢（深处）- 最大位移 20px
+      if (starfield) {
+        starfield.style.transform = `translate(${x * 10}px, ${y * 10}px)`;
+      }
+
+      // 壬水光晕移动较快（浅层）- 最大位移 40px
+      const oceanFlow = document.querySelector('.ocean-flow') as HTMLElement;
+      if (oceanFlow) {
+        oceanFlow.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
     return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
       document.body.removeChild(starfield);
     };
   }, []);
@@ -53,55 +76,144 @@ export default function Home() {
         <div className="ocean-blob ocean-blob-3"></div>
       </div>
 
+      {/* 琥珀色光斑 - 阳光射入深海 */}
+      <div className="amber-glow">
+        <div className="amber-spot amber-spot-1"></div>
+        <div className="amber-spot amber-spot-2"></div>
+      </div>
+
       {/* 顶部导航 */}
       <header className="border-b border-white/10 bg-white/5 backdrop-blur-md sticky top-0 z-30 relative">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-accent-glow border border-accent-blue/30 rounded-sm flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-accent-blue" />
-            </div>
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <AstraLogo size={40} />
             <div>
-              <h1 className="text-text-primary text-lg font-light tracking-[0.2em]">VisualClause</h1>
-              <p className="text-text-tertiary text-xs tracking-wider">数字分身 v1.0</p>
+              <h1 className="text-text-primary text-xl font-light tracking-[0.25em]">VisualClause</h1>
             </div>
           </div>
-          <div className="flex items-center gap-6 text-text-tertiary text-xs tracking-wider">
-            <span>INTJ</span>
-            <span>·</span>
-            <span>辛酉</span>
-            <span>·</span>
-            <span>金之墓库</span>
-          </div>
+
+          {/* 导航入口 */}
+          <nav className="flex items-center gap-8">
+            {[
+              { id: 'archive', label: 'Archive' },
+              { id: 'pulse', label: 'Pulse' },
+              { id: 'resonance', label: 'Resonance' }
+            ].map((item) => (
+              <motion.button
+                key={item.id}
+                onClick={() => setActiveSection(item.id as any)}
+                className={`text-sm tracking-wider font-serif transition-colors relative ${
+                  activeSection === item.id
+                    ? 'text-accent-gold'
+                    : 'text-text-tertiary hover:text-text-secondary'
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {item.label}
+                {activeSection === item.id && (
+                  <motion.div
+                    className="absolute -bottom-2 left-0 right-0 h-px bg-accent-gold"
+                    layoutId="activeNav"
+                    style={{
+                      boxShadow: '0 0 8px rgba(212, 175, 55, 0.6)'
+                    }}
+                  />
+                )}
+              </motion.button>
+            ))}
+          </nav>
         </div>
       </header>
 
       {/* 主内容区 */}
-      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-8 py-16 relative z-10">
         {/* 系统状态面板 */}
-        <SystemStatus />
+        <div className="mb-16">
+          <SystemEquilibrium />
+        </div>
 
-        {/* 章节标题 */}
-        <section className="mb-8">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-            <h2 className="text-text-primary text-sm tracking-[0.3em] uppercase">晶格流 // The Lattice Feed</h2>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-          </div>
-          <p className="text-center text-text-tertiary text-xs mt-4 tracking-widest">碎片化思考的聚合 // 逻辑严密的网格</p>
-        </section>
+        {/* 内容区域切换 */}
+        <AnimatePresence mode="wait">
+          {activeSection === 'feed' && (
+            <motion.div
+              key="feed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <section className="mb-12">
+                <h2 className="text-text-primary text-2xl tracking-[0.2em] font-serif text-center">The Lattice Feed</h2>
+              </section>
+              <LatticeGrid />
+            </motion.div>
+          )}
 
-        {/* Lattice 网格 */}
-        <LatticeGrid />
+          {activeSection === 'archive' && (
+            <motion.div
+              key="archive"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <section className="mb-12">
+                <h2 className="text-text-primary text-2xl tracking-[0.2em] font-serif text-center">Archive</h2>
+                <p className="text-text-tertiary text-sm text-center mt-4 font-mono">历史记忆的存储库</p>
+              </section>
+              <div className="metal-card p-12 text-center">
+                <p className="text-text-tertiary font-serif">档案内容正在整理中...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {activeSection === 'pulse' && (
+            <motion.div
+              key="pulse"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <section className="mb-12">
+                <h2 className="text-text-primary text-2xl tracking-[0.2em] font-serif text-center">Pulse</h2>
+                <p className="text-text-tertiary text-sm text-center mt-4 font-mono">思维的脉搏跳动</p>
+              </section>
+              <div className="metal-card p-12 text-center">
+                <p className="text-text-tertiary font-serif">脉搏数据收集中...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {activeSection === 'resonance' && (
+            <motion.div
+              key="resonance"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <section className="mb-12">
+                <h2 className="text-text-primary text-2xl tracking-[0.2em] font-serif text-center">Resonance</h2>
+                <p className="text-text-tertiary text-sm text-center mt-4 font-mono">与世界的共鸣频率</p>
+              </section>
+              <div className="metal-card p-12 text-center">
+                <p className="text-text-tertiary font-serif">共鸣记录正在建立...</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* 底部信息 */}
-      <footer className="border-t border-white/10 mt-20 py-8 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-text-tertiary text-xs tracking-wider">
-            Visual & Clause · 感性与理性的交汇点 · 2026
+      <footer className="border-t border-white/10 mt-32 py-12 relative z-10">
+        <div className="max-w-7xl mx-auto px-8 text-center">
+          <p className="text-text-tertiary text-sm tracking-wide font-serif">
+            Visual & Clause
           </p>
-          <p className="text-text-tertiary text-xs mt-2 tracking-widest">
-            拒绝平庸 · 崇尚逻辑 · 审美共振
+          <p className="text-text-tertiary text-xs mt-6 tracking-wider">
+            © 2025 Zhang YuLing
           </p>
         </div>
       </footer>

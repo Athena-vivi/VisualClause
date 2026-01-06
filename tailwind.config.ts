@@ -9,25 +9,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // 辛金质感配色体系
-        background: "#0A0A0B",      // 深邃黑
-        surface: "#161618",         // 金属钛灰
-        surfaceHover: "#1E1E20",    // 钛灰悬停态
-        text: {
-          primary: "#EDEDED",       // 高光银白
-          secondary: "#B0B0B2",     // 哑光银
-          tertiary: "#6B6B6E"       // 暗银灰
-        },
+        // VisualClause 色彩体系
+        primary: "#020617",           // 深海蓝 - Primary
+        secondary: "#F8FAFC",         // 银白色 - Secondary (逻辑线条)
         accent: {
-          blue: "#4A90E2",          // 冰川蓝
-          gold: "#D4AF37",          // 冷流沙金
-          glow: "rgba(74, 144, 226, 0.15)" // 冰川蓝微光
+          gold: "#D4AF37",            // 金黄色 - Accent (生命力/高光/交互)
+          goldGlow: "rgba(212, 175, 55, 0.25)",
+          blue: "#4A90E2",            // 辅助蓝
+          glow: "rgba(74, 144, 226, 0.15)"
         },
-        border: "rgba(237, 237, 237, 0.08)" // 极细金属边框
+        background: {
+          DEFAULT: "#0A0A0B",
+          surface: "#161618",
+          surfaceHover: "#1E1E20"
+        },
+        text: {
+          primary: "#EDEDED",         // 高光银白
+          secondary: "#B0B0B2",       // 哑光银
+          tertiary: "#6B6B6E"         // 暗银灰
+        },
+        border: "rgba(237, 237, 237, 0.08)"
       },
       fontFamily: {
         mono: ["var(--font-mono)", "monospace"],
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"]
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"]
       },
       borderWidth: {
         "0.5": "0.5px",

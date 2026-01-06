@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send } from 'lucide-react';
+import AstraLogo from './AstraLogo';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -92,7 +93,16 @@ export default function AIChat() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed bottom-28 right-8 z-40 w-96 max-h-[600px] bg-white/5 backdrop-blur-md border border-white/10 rounded-sm flex flex-col shadow-2xl"
+            className="fixed bottom-28 right-8 z-40 w-96 max-h-[600px] bg-white/5 backdrop-blur-md border border-white/10 rounded-sm flex flex-col"
+            style={{
+              /* 深空黑洞阴影 */
+              boxShadow: `
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+                0 4px 36px -3px rgba(0, 0, 0, 0.6),
+                0 12px 80px -8px rgba(0, 0, 0, 0.4),
+                0 0 40px -10px rgba(74, 144, 226, 0.15)
+              `
+            }}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -101,12 +111,9 @@ export default function AIChat() {
             {/* 头部 */}
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-accent-glow border border-accent-blue/30 rounded-full flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-accent-blue" />
-                </div>
+                <AstraLogo size={32} />
                 <div>
-                  <h3 className="text-text-primary text-sm font-medium tracking-wide">数字分身</h3>
-                  <p className="text-text-tertiary text-xs tracking-wide">在线 // INTJ模式</p>
+                  <h3 className="text-text-primary text-sm font-medium tracking-wide">Astra</h3>
                 </div>
               </div>
             </div>
@@ -115,9 +122,11 @@ export default function AIChat() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 && (
                 <div className="text-center py-8">
-                  <Sparkles className="w-8 h-8 text-accent-blue mx-auto mb-3 opacity-50" />
-                  <p className="text-text-secondary text-sm tracking-wide">与我的数字分身对话</p>
-                  <p className="text-text-tertiary text-xs mt-2 tracking-wider">崇尚逻辑 · 厌恶情绪</p>
+                  <div className="inline-block mb-4 opacity-60">
+                    <AstraLogo size={40} />
+                  </div>
+                  <p className="text-text-secondary text-sm tracking-wide font-serif mt-4">这里是 Astra 的逻辑余温。</p>
+                  <p className="text-text-tertiary text-xs mt-3 tracking-wider">告诉我，你在思考什么？</p>
                 </div>
               )}
 

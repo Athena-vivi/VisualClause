@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clause, getClauses } from '@/lib/supabase';
 import { Calendar, Tag, Sidebar } from 'lucide-react';
+import GoldParticles from './GoldParticles';
 
 interface LatticeCardProps {
   clause: Clause;
@@ -12,34 +13,50 @@ interface LatticeCardProps {
   onClick: () => void;
 }
 
-// Bento Grid 布局配置 - 模拟非线性思维
-function getCardSpan(index: number, contentLength: number) {
-  // 基于内容长度和索引生成错落有致的布局
-  const patterns = [
-    { colSpan: 'col-span-2', rowSpan: 'row-span-2' }, // 大卡片
-    { colSpan: 'col-span-1', rowSpan: 'row-span-1' }, // 普通卡片
-    { colSpan: 'col-span-1', rowSpan: 'row-span-2' }, // 竖长卡片
-    { colSpan: 'col-span-2', rowSpan: 'row-span-1' }, // 横宽卡片
-    { colSpan: 'col-span-1', rowSpan: 'row-span-1' },
-  ];
+// Bento Grid 布局配置 - 根据内容深度自适应
+function getCardSpan(index: number, clause: Clause) {
+  const contentLength = clause.content.length;
+  const hasTags = clause.tags && clause.tags.length > 0;
 
-  // 根据内容长度调整卡片大小
-  let patternIndex = index % patterns.length;
-  if (contentLength > 100) {
-    // 长内容使用大卡片或横宽卡片
-    patternIndex = index % 2 === 0 ? 0 : 3;
+  // 基于内容深度计算权重
+  const depthScore = contentLength + (hasTags ? 20 : 0);
+
+  // 根据深度选择卡片类型
+  let colSpan, rowSpan;
+
+  if (depthScore > 150) {
+    // 深度内容：大卡片 (2x2)
+    colSpan = 'col-span-2';
+    rowSpan = 'row-span-2';
+  } else if (depthScore > 80) {
+    // 中等内容：横宽卡片 (2x1)
+    colSpan = 'col-span-2';
+    rowSpan = 'row-span-1';
+  } else if (depthScore > 40) {
+    // 普通内容：竖长卡片 (1x2)
+    colSpan = 'col-span-1';
+    rowSpan = 'row-span-2';
+  } else {
+    // 简短内容：标准卡片 (1x1)
+    colSpan = 'col-span-1';
+    rowSpan = 'row-span-1';
   }
 
-  const pattern = patterns[patternIndex];
+  // 增加视觉变化：基于索引错开
+  if (index % 5 === 0 && depthScore < 100) {
+    colSpan = colSpan === 'col-span-1' ? 'col-span-2' : 'col-span-1';
+  }
 
   return {
-    desktop: pattern,
+    desktop: { colSpan, rowSpan },
     mobile: 'col-span-1'
   };
 }
 
 function LatticeCard({ clause, index, total, onClick }: LatticeCardProps) {
-  const spans = getCardSpan(index, clause.content.length);
+  const spans = getCardSpan(index, clause);
+  const [particleTrigger, setParticleTrigger] = useState(false);
+  const [clickPos, setClickPos] = useState({ x: 0, y: 0 });
 
   // 计算从中心向四周扩散的延迟
   const centerX = (total - 1) / 2;
@@ -50,53 +67,87 @@ function LatticeCard({ clause, index, total, onClick }: LatticeCardProps) {
     Math.pow(currentCol - centerX, 2) + Math.pow(currentRow - centerY, 2)
   );
 
+  const handleClick = (e: React.MouseEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setClickPos({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    });
+    setParticleTrigger(true);
+    setTimeout(() => setParticleTrigger(false), 100);
+    onClick();
+  };
+
   return (
-    <motion.div
-      className={`
-        metal-card p-6 cursor-pointer
-        ${spans.desktop.colSpan} ${spans.desktop.rowSpan}
-        md:${spans.desktop.colSpan} md:${spans.desktop.rowSpan}
-      `}
-      initial={{ opacity: 0, scale: 0.8, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{
-        duration: 0.6,
-        delay: distanceFromCenter * 0.1,
-        ease: [0.4, 0, 0.2, 1]
-      }}
-      whileHover={{
-        scale: 1.02,
-        boxShadow: '0 8px 32px -2px rgba(74, 144, 226, 0.15), 0 0 60px -15px rgba(74, 144, 226, 0.3)',
-        borderColor: 'rgba(74, 144, 226, 0.4)'
-      }}
-      onClick={onClick}
-    >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2 text-text-tertiary text-xs tracking-wider">
-          <Calendar className="w-3 h-3" />
-          {new Date(clause.created_at).toLocaleDateString('zh-CN')}
-        </div>
-        <div className="text-text-tertiary text-xs tracking-wider">{clause.source}</div>
-      </div>
+    <>
+      <motion.div
+        className={`
+          metal-card p-6 cursor-pointer relative
+          ${spans.desktop.colSpan} ${spans.desktop.rowSpan}
+          md:${spans.desktop.colSpan} md:${spans.desktop.rowSpan}
+          glass-3d
+        `}
+        style={{
+          transformStyle: 'preserve-3d',
+          perspective: 1000,
+        }}
+        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{
+          duration: 0.6,
+          delay: distanceFromCenter * 0.1,
+          ease: [0.4, 0, 0.2, 1]
+        }}
+        whileHover={{
+          rotateX: 5,
+          rotateY: -5,
+          z: 50,
+          scale: 1.02,
+          /* 深空黑洞阴影 - 琥珀金温度 3D 悬停状态 */
+          boxShadow: `
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+            0 20px 60px -10px rgba(0, 0, 0, 0.85),
+            0 30px 120px -15px rgba(0, 0, 0, 0.6),
+            0 0 80px -20px rgba(212, 175, 55, 0.35),
+            0 0 120px -30px rgba(212, 175, 55, 0.25)
+          `,
+          borderColor: 'rgba(212, 175, 55, 0.5)',
+          transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
+        }}
+        onClick={handleClick}
+      >
+        {/* 左上玻璃厚度高光 - 模拟边缘光线折射 */}
+        <div className="glass-edge" />
 
-      <p className="text-text-primary text-sm leading-relaxed mb-4 font-light tracking-wide">
-        {clause.content}
-      </p>
-
-      {clause.tags && clause.tags.length > 0 && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <Tag className="w-3 h-3 text-text-tertiary" />
-          {clause.tags.map((tag, i) => (
-            <span
-              key={i}
-              className="px-2 py-1 text-xs text-accent-blue bg-accent-glow border border-accent-blue/20 rounded-sm tracking-wide"
-            >
-              {tag}
-            </span>
-          ))}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-2 text-text-tertiary text-xs tracking-wider">
+            <Calendar className="w-3 h-3" />
+            {new Date(clause.created_at).toLocaleDateString('zh-CN')}
+          </div>
+          <div className="text-text-tertiary text-xs tracking-wider">{clause.source}</div>
         </div>
-      )}
-    </motion.div>
+
+        <p className="text-text-primary text-sm leading-relaxed mb-4 font-light tracking-wide">
+          {clause.content}
+        </p>
+
+        {clause.tags && clause.tags.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <Tag className="w-3 h-3 text-text-tertiary" />
+            {clause.tags.map((tag, i) => (
+              <span
+                key={i}
+                className="px-2 py-1 text-xs text-accent-blue bg-accent-glow border border-accent-blue/20 rounded-sm tracking-wide"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </motion.div>
+
+      <GoldParticles trigger={particleTrigger} x={clickPos.x} y={clickPos.y} />
+    </>
   );
 }
 
