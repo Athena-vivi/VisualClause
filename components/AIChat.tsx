@@ -2,7 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
-import { chatWithDigitalTwin, ChatMessage } from '@/lib/openrouter';
+
+export interface ChatMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
 
 export default function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,8 +32,26 @@ export default function AIChat() {
     setIsTyping(true);
 
     try {
-      const response = await chatWithDigitalTwin([...messages, userMessage]);
-      const assistantMessage: ChatMessage = { role: 'assistant', content: response };
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage]
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.reply
+      };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Chat error:', error);
@@ -128,7 +150,7 @@ export default function AIChat() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 placeholder="输入你的思考..."
                 className="flex-1 metal-input rounded-sm text-sm"
                 disabled={isTyping}
