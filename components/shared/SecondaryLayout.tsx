@@ -25,8 +25,8 @@ export default function SecondaryLayout({ children, title, bgClass = 'starsea-bg
       <LanguageSwitcher />
 
       {/* 页面标题 */}
-      <div className="pt-24 pb-12 px-6">
-        <h1 className="text-tertiary text-2xl md:text-3xl font-serif font-light tracking-[0.4em] text-center">
+      <div className="pt-16 pb-8 px-6">
+        <h1 className="text-tertiary text-2xl md:text-3xl font-serif font-light tracking-[0.8em] text-center">
           {title.toUpperCase()}
         </h1>
       </div>

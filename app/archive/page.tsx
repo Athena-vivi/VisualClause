@@ -13,9 +13,19 @@ const PREDEFINED_CATEGORIES = [
   '商业'
 ] as const;
 
+// 生成随机逻辑坐标（服务端）
+function generateLogicCoordinates() {
+  return Array.from({ length: 12 }, () => ({
+    x: Math.random().toFixed(4),
+    y: Math.random().toFixed(4),
+    z: Math.random().toFixed(4)
+  }));
+}
+
 export default async function ArchivePage() {
   const books = await getBooks();
   const latestClauses = await getEntries(2); // 获取最新 2 条 Clause
+  const logicCoordinates = generateLogicCoordinates();
 
   return (
     <SecondaryLayout title="Archive" bgClass="bookish-bg">
@@ -32,12 +42,35 @@ export default async function ArchivePage() {
         </p>
       </div>
 
+      {/* 环境细节：俄罗斯音乐余震 - 波形图 */}
+      <div className="fixed bottom-8 left-8 z-0 opacity-30">
+        <div className="flex items-end gap-0.5 h-8">
+          {Array.from({ length: 16 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-0.5 bg-accent-gold/20 animate-pulse"
+              style={{
+                height: `${20 + Math.random() * 60}%`,
+                animationDelay: `${i * 100}ms`,
+                animationDuration: `${2000 + Math.random() * 1000}ms`
+              }}
+            />
+          ))}
+        </div>
+        <p className="text-tertiary/30 text-[8px] tracking-[0.2em] mt-1">
+          MUSIC AFTERMATH
+        </p>
+      </div>
+
       {/* 主内容区：书架分类（左）+ 书桌（右） */}
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* 左侧：书架分类（纵向单列排列，占2列） */}
-          <div className="lg:col-span-2">
-            <div className="grid grid-cols-1 gap-8 max-w-2xl">
+          <div className="lg:col-span-2 relative">
+            {/* 垂直脊梁 - 书架支撑结构 */}
+            <div className="absolute left-0 top-0 bottom-0 w-[0.5px] bg-gradient-to-b from-transparent via-white/10 to-transparent -ml-5" />
+
+            <div className="grid grid-cols-1 gap-8 max-w-2xl pl-8">
               {PREDEFINED_CATEGORIES.map((category, categoryIndex) => {
                 // 查找该分类下的书籍
                 const categoryBooks = books.filter(book =>
@@ -56,12 +89,23 @@ export default async function ArchivePage() {
                       opacity: categoryIndex === 1 ? 1 : 0.85
                     }}
                   >
+                    {/* 逻辑坐标背景 - 半透明数字流 */}
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-5">
+                      <div className="text-[8px] font-mono text-accent-gold/40 tracking-widest leading-tight">
+                        {logicCoordinates.slice(categoryIndex * 3, (categoryIndex + 1) * 3).map((coord, i) => (
+                          <div key={i} className="whitespace-nowrap">
+                            [{coord.x} {coord.y} {coord.z}]
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* 分类标题 */}
-                    <div className="mb-6 pb-4 border-b border-white/10">
-                      <h3 className="text-tertiary text-sm tracking-[0.3em] opacity-60 mb-2">
+                    <div className="mb-6 pb-4 border-b border-white/10 relative">
+                      <h3 className="text-tertiary/40 text-xs font-mono tracking-[0.3em] mb-2">
                         {String(categoryIndex + 1).padStart(2, '0')}
                       </h3>
-                      <h3 className="text-secondary text-lg font-serif font-light tracking-wide">
+                      <h3 className="text-secondary text-lg font-serif font-light tracking-[0.2em]">
                         {category}
                       </h3>
                     </div>
@@ -74,7 +118,7 @@ export default async function ArchivePage() {
                       >
                         <div className="relative p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-sm hover:border-accent-gold/30 transition-all duration-500">
                           {/* 书名 */}
-                          <h4 className="text-secondary text-xl font-serif font-light leading-relaxed tracking-wide group-hover:text-accent-gold/90 transition-colors duration-500 mb-4">
+                          <h4 className="text-secondary text-xl font-serif font-light leading-relaxed tracking-[0.15em] group-hover:text-accent-gold/90 transition-colors duration-500 mb-4">
                             {primaryBook.content}
                           </h4>
 
@@ -111,7 +155,7 @@ export default async function ArchivePage() {
                     ) : (
                       /* 占位符 - 草稿状态 */
                       <div className="relative p-6 border border-dashed border-white/10 rounded-sm opacity-20">
-                        <h4 className="text-secondary text-xl font-serif font-light leading-relaxed tracking-wide mb-4">
+                        <h4 className="text-secondary text-xl font-serif font-light leading-relaxed tracking-[0.15em] mb-4">
                           {category}
                         </h4>
 
@@ -155,7 +199,15 @@ export default async function ArchivePage() {
           {/* 右侧：书桌模块 - THE ACTIVE DESK（占1列） */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-sm p-8">
+              {/* 3D 书桌效果 */}
+              <div
+                className="bg-white/5 backdrop-blur-xl border rounded-sm p-8"
+                style={{
+                  transform: 'perspective(1000px) rotateY(-2deg)',
+                  borderImage: 'linear-gradient(to right, rgba(245, 158, 11, 0.3) 0%, rgba(255, 255, 255, 0.1) 10%) 1',
+                  borderTop: '1px solid rgba(245, 158, 11, 0.3)'
+                }}
+              >
                 {/* 桌面标题 */}
                 <div className="mb-6 pb-4 border-b border-white/10">
                   <h3 className="text-accent-gold text-sm tracking-[0.3em] mb-2">
@@ -169,7 +221,7 @@ export default async function ArchivePage() {
                 {/* 最新 Clauses */}
                 {latestClauses.length === 0 ? (
                   <div className="text-center py-16">
-                    <p className="text-tertiary/30 text-xs tracking-[0.2em]">
+                    <p className="text-tertiary/20 text-[10px] tracking-[0.15em] font-light">
                       THE DESK IS CLEAR
                     </p>
                   </div>

@@ -1,26 +1,58 @@
 'use client';
 
 import { Entry } from '@/lib/supabase';
+import { useState } from 'react';
 
 interface ProtocolRendererProps {
   protocol: Entry;
+  index: number;
 }
 
-export default function ProtocolRenderer({ protocol }: ProtocolRendererProps) {
+export default function ProtocolRenderer({ protocol, index }: ProtocolRendererProps) {
   const format = protocol.metadata?.format || 'text';
+  const [isRecognized, setIsRecognized] = useState(false);
 
   return (
-    <div className="group relative">
-      {/* 协议标题 */}
-      <h3 className="text-secondary text-lg md:text-xl font-serif font-light mb-4 tracking-wide">
-        {protocol.content}
-      </h3>
+    <div
+      className="group relative"
+      onMouseEnter={() => setIsRecognized(true)}
+      onMouseLeave={() => setIsRecognized(false)}
+    >
+      {/* 协议夹 - 逻辑夹容器 */}
+      <div className="relative bg-white/[0.02] backdrop-blur-sm border border-white/[0.08] rounded-sm p-6 transition-all duration-500 hover:border-accent-gold/30">
+        {/* 系统识别反馈 - 3D 边框扩散效果 */}
+        {isRecognized && (
+          <>
+            <div className="absolute inset-0 border border-accent-gold/20 rounded-sm animate-pulse" />
+            <div className="absolute inset-0 border border-accent-gold/10 rounded-sm" style={{ animation: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite' }} />
+            <div className="absolute top-0 right-0 px-2 py-1 bg-accent-gold/10 border border-accent-gold/30 rounded-bl-sm">
+              <span className="text-accent-gold/80 text-[10px] font-mono tracking-[0.15em]">
+                IDENTIFIED
+              </span>
+            </div>
+          </>
+        )}
 
-      {/* 根据格式渲染不同内容 */}
-      {format === 'audio' && <AudioProtocol protocol={protocol} />}
-      {format === 'text' && <TextProtocol protocol={protocol} />}
-      {format === 'file' && <FileProtocol protocol={protocol} />}
-      {!format && <TextProtocol protocol={protocol} />}
+        {/* 场景编号 */}
+        <div className="absolute -top-3 -left-1">
+          <div className="bg-primary/80 backdrop-blur-sm px-3 py-1 border border-accent-gold/30 rounded-sm">
+            <span className="text-accent-gold text-xs font-mono tracking-[0.2em]">
+              SCN-{(index + 1).toString().padStart(3, '0')}
+            </span>
+          </div>
+        </div>
+
+        {/* 协议标题 */}
+        <h3 className="text-secondary text-lg md:text-xl font-serif font-light mb-4 tracking-wide mt-2">
+          {protocol.content}
+        </h3>
+
+        {/* 根据格式渲染不同内容 */}
+        {format === 'audio' && <AudioProtocol protocol={protocol} />}
+        {format === 'text' && <TextProtocol protocol={protocol} />}
+        {format === 'file' && <FileProtocol protocol={protocol} />}
+        {!format && <TextProtocol protocol={protocol} />}
+      </div>
 
       {/* 点击时的琥珀金微光反馈 */}
       <div className="absolute inset-0 bg-accent-gold/5 opacity-0 group-active:opacity-100 transition-opacity duration-150 pointer-events-none rounded-sm -z-10" />
@@ -75,7 +107,7 @@ function TextProtocol({ protocol }: { protocol: Entry }) {
       )}
 
       {/* 协议内容 */}
-      <div className="text-secondary/80 text-sm leading-relaxed tracking-wide whitespace-pre-wrap">
+      <div className="text-secondary/80 text-sm leading-relaxed tracking-wide whitespace-pre-wrap font-mono">
         {protocol.metadata?.description || protocol.content}
       </div>
 
@@ -85,7 +117,7 @@ function TextProtocol({ protocol }: { protocol: Entry }) {
           {protocol.tags.map((tag, index) => (
             <span
               key={index}
-              className="px-3 py-1 bg-white/5 border border-white/10 rounded text-tertiary text-xs tracking-[0.15em]"
+              className="px-3 py-1 bg-white/5 border border-white/10 rounded text-tertiary text-xs tracking-[0.15em] font-mono"
             >
               {tag}
             </span>
